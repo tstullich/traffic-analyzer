@@ -139,6 +139,20 @@ public class TrafficTree {
 	}
 	
 	/**
+	 * Finds a list of IP address sources that try to access
+	 * inexistent resources.
+	 * @param address the address of a dead resource
+	 * @return a list of all IP addresses pointing to the resource
+	 */
+	//TODO HEY
+	public ArrayList<TreeNode> findOrphans(String address) {
+		ArrayList<TreeNode> orphans = new ArrayList<TreeNode>();
+		
+		
+		return null;
+	}
+	
+	/**
 	 * Returns the size of the current tree. Value can be 0
 	 * @return the size of the tree
 	 */

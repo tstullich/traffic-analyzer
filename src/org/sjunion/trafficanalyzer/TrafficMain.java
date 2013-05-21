@@ -25,7 +25,7 @@ public class TrafficMain {
 		
 		if (args.length != 1) {
 			System.out.println("No file specified. Please supply a CSV" 
-					+ "file from a run of WireShark: " + args.length);
+					+ " file from a run of WireShark: " + args.length);
 			return;
 		}
 		
@@ -51,7 +51,8 @@ public class TrafficMain {
 			System.out.print("What would you like to do? \n"
 					+ "1. View Logged IP Addresses\n"
 					+ "2. View Traffic From A Specific IP Address\n"
-					+ "3. Quit\n"
+					+ "3. Find IPs Pointing To Specific Destination\n" 
+					+  "4. Quit\n"
 					+ "> ");
 			userInput = in.next();
 			processInput(userInput);
@@ -85,6 +86,8 @@ public class TrafficMain {
 							}
 						}
 						break;
+		    //TODO HEY
+			case "3" : break;
 			default : break;
 		}
 	}
