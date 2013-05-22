@@ -90,12 +90,11 @@ public class TrafficMain {
 							}
 						}
 						break;
-		    //TODO HEY
 			case "3" : System.out.print("Protocol > ");
 						String protocol = in.next();
 						ArrayList<TreeNode> list = tree.findProtocol(protocol);
 						if (list.size() == 0) {
-							System.out.println("No IPs With That Protocol Found");
+							System.out.println("->No IPs With That Protocol Found<-");
 						}
 						else {
 							System.out.println("Found These IP Addresses:");
@@ -106,14 +105,14 @@ public class TrafficMain {
 						break;
 			case "4" :  System.out.print("Resource IP > ");
 						String address = in.next();
-						ArrayList<TreeNode> oList = tree.findProtocol(address);
+						ArrayList<TreeNode> oList = tree.findOrphans(address);
 						if (oList.size() == 0) {
-							System.out.println("No IPs Access That Resource");
+							System.out.println("->No IPs Access That Resource<-");
 						}
 						else {
 							System.out.println("Found These IP Addresses:");
 							for (int i = 1; i <= oList.size(); i++) {
-								System.out.println("[i"  + "] " + oList.get(i - 1).getAddress());
+								System.out.println("[" + i  + "] " + oList.get(i - 1).getAddress());
 							}
 						}
 						break;	

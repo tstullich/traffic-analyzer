@@ -170,6 +170,12 @@ public class TrafficTree {
 		return list;
 	}
 	
+	/**
+	 * Recursive method to find IP addresses that access dead resources
+	 * @param root the node to start on
+	 * @param list the list to store found nodes in
+	 * @param address the address to look for
+	 */
 	private void findOrphansHelper(TreeNode root, ArrayList<TreeNode> list, String address) {
 		if (root == null){
 			return;
@@ -179,8 +185,8 @@ public class TrafficTree {
 				list.add(root);
 			}
 		}
-		findProtocolsHelper(root.left, list, address);
-		findProtocolsHelper(root.right, list, address);
+		findOrphansHelper(root.left, list, address);
+		findOrphansHelper(root.right, list, address);
 	}
 	
 	/**
