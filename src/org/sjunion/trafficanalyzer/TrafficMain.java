@@ -1,8 +1,13 @@
 package org.sjunion.trafficanalyzer;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 import org.sjunion.trafficanalyzer.TrafficTree.TreeNode;
@@ -19,12 +24,16 @@ public class TrafficMain {
 
 	private static TrafficTree tree;
 	private static Scanner in;
+	private static long time;
+	private static String logName;
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
 		tree = new TrafficTree();
+		time = System.currentTimeMillis();
+		logName = "log" + String.valueOf(time);
 		
 		if (args.length != 1) {
 			System.out.println("No file specified. Please supply a CSV" 
@@ -61,7 +70,8 @@ public class TrafficMain {
 			userInput = in.next();
 			processInput(userInput);
 		}
-		System.out.print("Exiting...");
+		System.out.println("Exiting");
+		System.out.println("Log was written to file " + logName);
 		in.close();
 	}
 
@@ -69,8 +79,9 @@ public class TrafficMain {
 	 * Processes user Input from main method and requests more as
 	 * needed.
 	 * @param userInput
+	 * @throws IOException 
 	 */
-	private static void processInput(String userInput) {
+	private static void processInput(String userInput) throws IOException {
 		switch (userInput) {
 			case "1" : tree.printIPs();
 						break;
@@ -98,22 +109,48 @@ public class TrafficMain {
 						}
 						else {
 							System.out.println("Found These IP Addresses:");
+							File f = new File(logName);
+							if (!f.exists()) {
+								f.createNewFile();
+							}
+							FileWriter fStream = new FileWriter(f, true);
+							BufferedWriter out = new BufferedWriter(fStream);
+							out.write("IPs Using [" + protocol + "]\n");
 							for (int i = 1; i <= list.size(); i++) {
 								System.out.println("[" + i + "] " + list.get(i - 1).getAddress());
+								out.write("[" + i + "] " + list.get(i - 1).getAddress() + "\n");
 							}
+							out.write("\n");
+							out.close();
 						}
 						break;
 			case "4" :  System.out.print("Resource IP > ");
 						String address = in.next();
-						ArrayList<TreeNode> oList = tree.findOrphans(address);
+						HashMap<TreeNode, ArrayList<String>> oList = tree.findOrphans(address);
 						if (oList.size() == 0) {
 							System.out.println("->No IPs Access That Resource<-");
 						}
 						else {
 							System.out.println("Found These IP Addresses:");
-							for (int i = 1; i <= oList.size(); i++) {
-								System.out.println("[" + i  + "] " + oList.get(i - 1).getAddress());
+							File f = new File(logName);
+							if (!f.exists()) {
+								f.createNewFile();
 							}
+							FileWriter fStream = new FileWriter(f, true);
+							BufferedWriter out = new BufferedWriter(fStream);
+							out.write("IPs Accessing " + address + "\n");
+							int i = 1;
+							for (Entry<TreeNode, ArrayList<String>> entry : oList.entrySet()) {
+								System.out.println("[" + i + "] " + entry.getKey().getAddress());
+								out.write("[" + i + "] " + entry.getKey().getAddress() + "\n");
+								for (String packet : entry.getValue()) {
+									System.out.println(packet);
+									out.write(packet + "\n");
+								}
+								i++;
+							}
+							out.write("\n");
+							out.close();
 						}
 						break;	
 			default : break;

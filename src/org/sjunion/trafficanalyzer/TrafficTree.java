@@ -1,5 +1,6 @@
 package org.sjunion.trafficanalyzer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -176,13 +177,20 @@ public class TrafficTree {
 	 * @param list the list to store found nodes in
 	 * @param address the address to look for
 	 */
-	private void findOrphansHelper(TreeNode root, ArrayList<TreeNode> list, String address) {
+	private void findOrphansHelper(TreeNode root, HashMap<TreeNode, ArrayList<String>> list, String address) {
 		if (root == null){
 			return;
 		}
 		for (String[] packet : root.getTraffic()) {
-			if (packet[3].equalsIgnoreCase(address) && !list.contains(root)) {
-				list.add(root);
+			if (packet[3].equalsIgnoreCase(address) && list.containsKey(root)) {
+				String s = "Port: " + packet[7] + " Packet: " + packet[4];
+				list.get(root).add(s);
+			}
+			else if (packet[3].equalsIgnoreCase(address) && !list.containsKey(root)) {
+				String s = "Port: " + packet[7] + " Packet: " + packet[4];
+				ArrayList<String> newList = new ArrayList<String>();
+				newList.add(s);
+				list.put(root, newList);
 			}
 		}
 		findOrphansHelper(root.left, list, address);
@@ -194,8 +202,8 @@ public class TrafficTree {
 	 * @param address the address to that is no longer in use
 	 * @return ip addresses that point to address
 	 */
-	public ArrayList<TreeNode> findOrphans(String address) {
-		ArrayList<TreeNode> orphans = new ArrayList<TreeNode>();
+	public HashMap<TreeNode, ArrayList<String>> findOrphans(String address) {
+		HashMap<TreeNode, ArrayList<String>> orphans = new HashMap<TreeNode, ArrayList<String>>();
 		findOrphansHelper(root, orphans, address);
 		return orphans;
 	}
