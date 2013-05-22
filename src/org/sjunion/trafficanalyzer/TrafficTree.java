@@ -139,17 +139,59 @@ public class TrafficTree {
 	}
 	
 	/**
-	 * Finds a list of IP address sources that try to access
-	 * inexistent resources.
-	 * @param address the address of a dead resource
-	 * @return a list of all IP addresses pointing to the resource
+	 * Recursively searches through the tree and packets to find
+	 * nodes that try to use a certain protocol
+	 * @param root the node to start on
+	 * @param list the list to store the nodes
+	 * @param address the protocol to be found
 	 */
-	//TODO HEY
+	private void findProtocolsHelper(TreeNode root, ArrayList<TreeNode> list, String protocol) {
+		if (root == null){
+			return;
+		}
+		for (String[] packet : root.getTraffic()) {
+			if (packet[4].equalsIgnoreCase(protocol) && !list.contains(root)) {
+				list.add(root);
+			}
+		}
+		findProtocolsHelper(root.left, list, protocol);
+		findProtocolsHelper(root.right, list, protocol);
+	}
+	
+	/**
+	 * Finds a list of IP addresses that try to access
+	 * a certain protocol.
+	 * @param the protocol to look for
+	 * @return a list of all IP addresses using the protocol
+	 */
+	public ArrayList<TreeNode> findProtocol(String protocol) {
+		ArrayList<TreeNode> list = new ArrayList<TreeNode>();
+		findProtocolsHelper(root, list, protocol);
+		return list;
+	}
+	
+	private void findOrphansHelper(TreeNode root, ArrayList<TreeNode> list, String address) {
+		if (root == null){
+			return;
+		}
+		for (String[] packet : root.getTraffic()) {
+			if (packet[3].equalsIgnoreCase(address) && !list.contains(root)) {
+				list.add(root);
+			}
+		}
+		findProtocolsHelper(root.left, list, address);
+		findProtocolsHelper(root.right, list, address);
+	}
+	
+	/**
+	 * Finds IP addresses that try to access dead resources
+	 * @param address the address to that is no longer in use
+	 * @return ip addresses that point to address
+	 */
 	public ArrayList<TreeNode> findOrphans(String address) {
 		ArrayList<TreeNode> orphans = new ArrayList<TreeNode>();
-		
-		
-		return null;
+		findOrphansHelper(root, orphans, address);
+		return orphans;
 	}
 	
 	/**
@@ -193,8 +235,12 @@ public class TrafficTree {
 			left = null;
 			traffic = new ArrayList<String[]>();
 			String[] newData = data.split(",");
+			
+			//Clean the String of useless characters
+			for (int i = 0; i < newData.length; i++) {
+				newData[i] = newData[i].replace("\"", "");
+			}
 			traffic.add(newData);
-			newData[2] = newData[2].replace("\"", "");
 			if (isValidIP(newData[2])) {
 				address = newData[2];
 			}
@@ -219,10 +265,18 @@ public class TrafficTree {
 		
 		/**
 		 * Returns all the currently recorded traffic from the node
-		 * @return The list of traffic
+		 * @return the list of traffic
 		 */
 		public ArrayList<String[]> getTraffic() {
 			return this.traffic;
+		}
+		
+		/**
+		 * Returns the IP address of the given node
+		 * @return the IP address 
+		 */
+		public String getAddress() {
+			return this.address;
 		}
 		
 		/**

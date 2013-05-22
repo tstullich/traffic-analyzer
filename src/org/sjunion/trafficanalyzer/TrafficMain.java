@@ -2,7 +2,10 @@ package org.sjunion.trafficanalyzer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import org.sjunion.trafficanalyzer.TrafficTree.TreeNode;
 
 /**
  * The main class for the traffic analyzer.
@@ -44,20 +47,21 @@ public class TrafficMain {
 		}
 		br.close();
 		
-		System.out.println("\nIPs: " + tree.size());
+		System.out.println("\nIPs Logged: " + tree.size());
 		in = new Scanner(System.in);
 		String userInput = "";
-		while (!userInput.equals("3")) {
+		while (!userInput.equals("5")) {
 			System.out.print("What would you like to do? \n"
 					+ "1. View Logged IP Addresses\n"
 					+ "2. View Traffic From A Specific IP Address\n"
-					+ "3. Find IPs Pointing To Specific Destination\n" 
-					+  "4. Quit\n"
+					+ "3. Find IPs Using A Specific Protocol\n"
+					+ "4. Find IPs Using A Dead Resource\n"
+					+  "5. Quit\n"
 					+ "> ");
 			userInput = in.next();
 			processInput(userInput);
 		}
-		System.out.println("Exiting...");
+		System.out.print("Exiting...");
 		in.close();
 	}
 
@@ -70,13 +74,13 @@ public class TrafficMain {
 		switch (userInput) {
 			case "1" : tree.printIPs();
 						break;
-			case "2" : 	System.out.print("Input IP > ");
+			case "2" : 	System.out.print("IP > ");
 						String ip = in.next();
 						if (!TrafficTree.isValidIP(ip)) {
 							System.out.println("Invalid IP Format (Use IPv4)");
 						}
 						else {
-							TrafficTree.TreeNode n = tree.searchTree(ip);
+							TreeNode n = tree.searchTree(ip);
 							if (n == null) {
 								System.out.println("IP Not Found");
 							}
@@ -87,7 +91,32 @@ public class TrafficMain {
 						}
 						break;
 		    //TODO HEY
-			case "3" : break;
+			case "3" : System.out.print("Protocol > ");
+						String protocol = in.next();
+						ArrayList<TreeNode> list = tree.findProtocol(protocol);
+						if (list.size() == 0) {
+							System.out.println("No IPs With That Protocol Found");
+						}
+						else {
+							System.out.println("Found These IP Addresses:");
+							for (int i = 1; i <= list.size(); i++) {
+								System.out.println("[" + i + "] " + list.get(i - 1).getAddress());
+							}
+						}
+						break;
+			case "4" :  System.out.print("Resource IP > ");
+						String address = in.next();
+						ArrayList<TreeNode> oList = tree.findProtocol(address);
+						if (oList.size() == 0) {
+							System.out.println("No IPs Access That Resource");
+						}
+						else {
+							System.out.println("Found These IP Addresses:");
+							for (int i = 1; i <= oList.size(); i++) {
+								System.out.println("[i"  + "] " + oList.get(i - 1).getAddress());
+							}
+						}
+						break;	
 			default : break;
 		}
 	}
