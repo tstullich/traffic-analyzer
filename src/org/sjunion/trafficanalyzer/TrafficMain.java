@@ -33,7 +33,8 @@ public class TrafficMain {
 	public static void main(String[] args) throws IOException {
 		tree = new TrafficTree();
 		time = System.currentTimeMillis();
-		logName = "log" + String.valueOf(time);
+		//Generate a random name for the log file
+		logName = "log" + time;
 		
 		if (args.length != 1) {
 			System.out.println("No file specified. Please supply a CSV" 
@@ -117,8 +118,6 @@ public class TrafficMain {
 							BufferedWriter out = new BufferedWriter(fStream);
 							out.write("IPs Using [" + protocol + "]\n");
 							for (int i = 1; i <= list.size(); i++) {
-								//System.out.println("[" + i + "] " + list.get(i - 1).getAddress());
-								//out.write("[" + i + "] " + list.get(i - 1).getAddress() + "\n");
 								ArrayList<String> activity = list.get(i - 1).protocolToTraffic(protocol);
 								System.out.println("[" + i + "] " + list.get(i - 1).getAddress());
 								out.write("[" + i + "] " + list.get(i - 1).getAddress() + "\n");

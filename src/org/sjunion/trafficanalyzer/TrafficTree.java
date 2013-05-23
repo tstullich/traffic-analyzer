@@ -116,7 +116,7 @@ public class TrafficTree {
 	 * @return <b>TreeNode</b> if the node was found <br></br>
 	 * 		   <b>null</b> if the node does not exist in the tree
 	 */
-	public TreeNode searchTreeRec(TreeNode node, String address) {
+	private TreeNode searchTreeRec(TreeNode node, String address) {
 		if (node == null || node.address.equals(address)) {
 			return node;
 		}
