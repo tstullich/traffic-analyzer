@@ -182,15 +182,27 @@ public class TrafficTree {
 			return;
 		}
 		for (String[] packet : root.getTraffic()) {
-			if (packet[3].equalsIgnoreCase(address) && list.containsKey(root)) {
-				String s = "Port: " + packet[7] + " Packet: " + packet[4];
-				list.get(root).add(s);
-			}
-			else if (packet[3].equalsIgnoreCase(address) && !list.containsKey(root)) {
-				String s = "Port: " + packet[7] + " Packet: " + packet[4];
+			if (packet[3].equalsIgnoreCase(address) && !list.containsKey(root)) {
+				String s = "Port: " 
+							+ packet[7] 
+							+ " | Packet: " 
+							+ packet[4]
+							+ " | Occurences: "
+							+ root.countTraffic(packet[7]);
 				ArrayList<String> newList = new ArrayList<String>();
 				newList.add(s);
 				list.put(root, newList);
+			}
+			else if (list.containsKey(root)
+						&& packet[3].equalsIgnoreCase(address) 
+						&& !hasString(list.get(root), packet[7])) {
+				String s = "Port: " 
+						+ packet[7] 
+						+ " | Packet: " 
+						+ packet[4]
+						+ " | Occurences: "
+						+ root.countTraffic(packet[7]);
+				list.get(root).add(s);
 			}
 		}
 		findOrphansHelper(root.left, list, address);
@@ -230,6 +242,22 @@ public class TrafficTree {
 	}
 	
 	/**
+	 * Quick convenience method to check if a string is 
+	 * already contained in a list
+	 * @param list the list to search in
+	 * @param pattern the pattern the string needs to match
+	 * @return true if the string is already in the list
+	 */
+	private static boolean hasString(ArrayList<String> list, String pattern) {
+		for (String s : list) {
+			if (s.contains(pattern)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Quick inner class that will represent a node in the
 	 * binary tree. <b>Things to fix</b>: <dl>
 	 *  <li>Create actual wrapper class for packet data. Current implementation
@@ -248,7 +276,7 @@ public class TrafficTree {
 			right = null;
 			left = null;
 			traffic = new ArrayList<String[]>();
-			String[] newData = data.split(",");
+			String[] newData = data.split("\",\"");
 			
 			//Clean the String of useless characters
 			for (int i = 0; i < newData.length; i++) {
@@ -278,6 +306,23 @@ public class TrafficTree {
 		}
 		
 		/**
+		 * Finds a list of activities the address tried to access
+		 * based on the protocol
+		 * @param protocol
+		 * @return
+		 */
+		public ArrayList<String> protocolToTraffic(String protocol) {
+			ArrayList<String> list = new ArrayList<String>();
+			for (String[] packet : traffic){
+				if (packet[4].equalsIgnoreCase(protocol) && !hasString(list, packet[7])){
+					String s = "Destination Port: " + packet[7];
+					list.add(s);
+				}
+			}
+			return list;
+		}
+		
+		/**
 		 * Returns all the currently recorded traffic from the node
 		 * @return the list of traffic
 		 */
@@ -302,6 +347,22 @@ public class TrafficTree {
 		}
 
 		/**
+		 * Counts how many times a certain traffic pattern appears
+		 * and returns it as an integer
+		 * @param pattern the pattern to look
+		 * @return the number of occurences
+		 */
+		public int countTraffic(String pattern){
+			int count = 0;
+			for (String[] packet : traffic) {
+				if (packet[7].equalsIgnoreCase(pattern)) {
+					count++;
+				}
+			}
+			return count;
+		}
+		
+		/** 
 		 * Compares IP Adresses to see if they match or are greater(non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */

@@ -64,7 +64,7 @@ public class TrafficMain {
 					+ "1. View Logged IP Addresses\n"
 					+ "2. View Traffic From A Specific IP Address\n"
 					+ "3. Find IPs Using A Specific Protocol\n"
-					+ "4. Find IPs Using A Dead Resource\n"
+					+ "4. Find IPs That Try To Access An Unreachable Resource\n"
 					+  "5. Quit\n"
 					+ "> ");
 			userInput = in.next();
@@ -117,8 +117,15 @@ public class TrafficMain {
 							BufferedWriter out = new BufferedWriter(fStream);
 							out.write("IPs Using [" + protocol + "]\n");
 							for (int i = 1; i <= list.size(); i++) {
+								//System.out.println("[" + i + "] " + list.get(i - 1).getAddress());
+								//out.write("[" + i + "] " + list.get(i - 1).getAddress() + "\n");
+								ArrayList<String> activity = list.get(i - 1).protocolToTraffic(protocol);
 								System.out.println("[" + i + "] " + list.get(i - 1).getAddress());
 								out.write("[" + i + "] " + list.get(i - 1).getAddress() + "\n");
+								for (String str : activity) {
+									System.out.println("-> " + str);
+									out.write("-> " + str + "\n");
+								}
 							}
 							out.write("\n");
 							out.close();
